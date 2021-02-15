@@ -1,10 +1,8 @@
-a = [1, 2, 3]
-
-# Example of a method definition that modifies its argument permanently
-def mutate(array)
-  array.pop
+def fix(value)
+  value.upcase!
+  value.concat('!')
+  value
 end
 
-puts "Before mutate method: #{a}"
-mutate(a)
-puts "After mutate method: #{a}"
+s = 'hello'
+t = fix(s)
