@@ -1,11 +1,3 @@
-# ask the user for two numbers
-# ask the user for an operation to preform
-# preform the operation on the two numbers
-# output the result
-
-# answer = Kernel.gets()
-# Kernel.puts(answer)
-
 require 'yaml'
 MESSAGES = YAML.load_file('calculator_messages.yml')
 LANGUAGE = 'en'
@@ -13,8 +5,6 @@ LANGUAGE = 'en'
 def messages(message, lang='en')
   MESSAGES[lang][message]
 end
-
-# puts MESSAGES.inspect
 
 def prompt(key)
   message = messages(key, LANGUAGE)
@@ -33,100 +23,89 @@ def valid_number?(input)
   integer?(input) || float?(input)
 end
 
-def operation_to_message(op)
-  word = case op
-           when '1'
-             'Adding'
-           when '2'
-             'Subtracting'
-           when '3'
-             'Multiplying'
-           when '4'
-             'Dividing'
-           end
+def get_name
+  name = ''
+  loop do
+    name = Kernel.gets().chomp()
+    break if valid_name?(name)
+  end
+  name
+end
 
-word
+def valid_name?(name)
+  name.empty? ? prompt('valid_name') : name
+end
+
+def get_number(message)
+  number = ''
+  loop do
+    prompt message
+    number = Kernel.gets().chomp()
+    break if valid_number?(number)
+    prompt('valid_number')
+  end
+  number
+end
+
+def get_operator
+  prompt 'operator_prompt'
+  op = ''
+  loop do
+    op = Kernel.gets().chomp()
+    break if valid_operator?(op)
+    prompt('valid_operator')
+  end
+  puts "=> #{operation_to_message(op)} #{messages('operation_message')}"
+  op
+end
+
+def valid_operator?(op)
+  %w(1 2 3 4).include? op
+end
+
+def operation_to_message(op)
+  case op
+  when '1'
+    'Adding'
+  when '2'
+    'Subtracting'
+  when '3'
+    'Multiplying'
+  when '4'
+    'Dividing'
+  end
+end
+
+def crunch_numbers(num1, num2, op)
+  case op
+  when '1'
+    num1.to_i() + num2.to_i()
+  when '2'
+    num1.to_i() - num2.to_i()
+  when '3'
+    num1.to_i() * num2.to_i()
+  when '4'
+    num1.to_f() / num2.to_f()
+  end
+end
+
+def another_calc?
+  prompt 'another_calc'
+  answer = Kernel.gets().chomp()
+  answer.downcase().start_with? 'y'
 end
 
 prompt 'welcome'
-
-name = ''
-loop do
-  name = Kernel.gets().chomp()
-
-  if name.empty?
-    prompt 'valid_name'
-  else
-    break
-  end
-end
-
-puts(MESSAGES[LANGUAGE]["greeting"] + name)
+name = get_name
+puts "=> #{messages("greeting")} #{name}"
 
 loop do
-  number1 = ''
-  number2 = ''
-  loop do
-    prompt 'first_number'
-    number1 = Kernel.gets().chomp()
-
-    if valid_number? number1
-      break
-    else
-      prompt 'valid_number'
-    end
-  end
-
-  loop do
-    prompt 'second_number'
-    number2 = Kernel.gets().chomp()
-
-    if valid_number? number2
-      break
-    else
-      prompt 'valid_number'
-    end
-  end
-
-  operator_prompt = <<-MSG
-    What operation would you like to perform?
-    1) add
-    2) subtract
-    3) multiply
-    4) divide
-  MSG
-
-  puts "=> #{operator_prompt}"
-
-  operator = ''
-  loop do
-    operator = Kernel.gets().chomp()
-
-    if %w(1 2 3 4).include? operator
-      break
-    else
-      prompt 'valid_operator'
-    end
-  end
-
-  puts(operation_to_message(operator) + MESSAGES[LANGUAGE]['operation_message'])
-
-  result = case operator
-           when '1'
-             number1.to_i() + number2.to_i()
-           when '2'
-             number1.to_i() - number2.to_i()
-           when '3'
-             number1.to_i() * number2.to_i()
-           when '4'
-             number1.to_f() / number2.to_f()
-           end
-
-  puts(MESSAGES[LANGUAGE]["result"] + result.to_s)
-
-  prompt 'another_calc'
-  answer = Kernel.gets().chomp()
-  break unless answer.downcase().start_with? 'y'
+  number1 = get_number('first_number')
+  number2 = get_number('second_number')
+  operator = get_operator
+  result = crunch_numbers(number1, number2, operator)
+  puts "=> #{messages("result")} #{result.to_s}"
+  break unless another_calc?
 end
 
 prompt 'good_bye'

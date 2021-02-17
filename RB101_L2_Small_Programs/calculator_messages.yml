@@ -5,20 +5,26 @@ en:
   first_number: "What's the first number?"
   valid_number: "Hmm. That doesn't look like a valid number"
   second_number: "What's the second number?"
+  operator_prompt: "What operation would you like to perform?
+        \n    1) add
+        \n    2) subtract
+        \n    3) multiply
+        \n    4) divide
+        \n "
   valid_operator: "Must choose 1, 2, 3, 4"
-  operation_message: " the two numbers..."
-  result: "The result is "
+  operation_message: "the two numbers..."
+  result: "The result is"
   another_calc: "Do you want to perform another calculation? (Y to calculate again)"
   good_bye: "Thank you for using the calculator. Good bye!"
-es:
-  welcome: "SPANISH: Welcome to Calculator! Enter your name:"
-  valid_name: "SPANISH: Make sure to use a valid name."
-  greeting: "SPANISH: Hi "
-  first_number: "SPANISH: What's the first number?"
-  valid_number: "SPANISH: Hmm. That doesn't look like a valid number"
-  second_number: "SPANISH: What's the second number?"
-  valid_operator: "SPANISH: Must choose 1, 2, 3, 4"
-  operation_message: "SPANISH:  the two numbers..."
-  result: "SPANISH: The result is "
-  another_calc: "SPANISH: Do you want to perform another calculation? (Y to calculate again)"
-  good_bye: "SPANISH: Thank you for using the calculator. Good bye!"
+de:
+  welcome: "Willkommen bei Calculator! Gib deinen Namen ein:"
+  valid_name: "Stellen Sie sicher, dass Sie einen gültigen Namen verwenden."
+  greeting: "Hallo "
+  first_number: "Was ist die erste Nummer?"
+  valid_number: "Hmm. Das sieht nicht nach einer gültigen Nummer aus."
+  second_number: "Was ist die zweite Nummer?"
+  valid_operator: "Muss 1, 2, 3, 4 wählen"
+  operation_message: "die zwei Zahlen..."
+  result: "Das Ergebnis ist"
+  another_calc: "Möchten Sie eine weitere Berechnung durchführen? (Y, um erneut zu berechnen)"
+  good_bye: "Vielen Dank, dass Sie den Taschenrechner verwenden. Auf Wiedersehen!"
