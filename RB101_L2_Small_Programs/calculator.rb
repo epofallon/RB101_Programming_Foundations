@@ -11,16 +11,14 @@ def prompt(key)
   Kernel.puts("=> #{message}")
 end
 
-def integer?(num)
-  num.to_i.to_s == num
+def clear
+  system("clear") || system("cls")
 end
 
-def float?(num)
-  num.to_f.to_s == num
-end
-
-def valid_number?(input)
-  integer?(input) || float?(input)
+def welcome
+  clear
+  prompt 'welcome'
+  get_name
 end
 
 def get_name
@@ -29,7 +27,7 @@ def get_name
     name = Kernel.gets().chomp()
     break if valid_name?(name)
   end
-  name
+  puts "=> #{messages("greeting")} #{name}"
 end
 
 def valid_name?(name)
@@ -47,12 +45,32 @@ def get_number(message)
   number
 end
 
-def get_operator
+def integer?(num)
+  num.to_i.to_s == num
+end
+
+def float?(num)
+  num.to_f.to_s == num
+end
+
+def valid_number?(input)
+  integer?(input) || float?(input)
+end
+
+def zero_div?(num, op)
+  num.to_i == 0 && op == '4'
+end
+
+def get_operator(num2)
   prompt 'operator_prompt'
   op = ''
   loop do
     op = Kernel.gets().chomp()
-    break if valid_operator?(op)
+    if valid_operator?(op) && zero_div?(num2, op) != true
+      break
+    elsif zero_div?(num2, op)
+      prompt('divided_by_zero')
+    end
     prompt('valid_operator')
   end
   puts "=> #{operation_to_message(op)} #{messages('operation_message')}"
@@ -65,28 +83,25 @@ end
 
 def operation_to_message(op)
   case op
-  when '1'
-    'Adding'
-  when '2'
-    'Subtracting'
-  when '3'
-    'Multiplying'
-  when '4'
-    'Dividing'
+  when '1' then 'Adding'
+  when '2' then 'Subtracting'
+  when '3' then 'Multiplying'
+  when '4' then 'Dividing'
   end
 end
 
 def crunch_numbers(num1, num2, op)
-  case op
-  when '1'
-    num1.to_i() + num2.to_i()
-  when '2'
-    num1.to_i() - num2.to_i()
-  when '3'
-    num1.to_i() * num2.to_i()
-  when '4'
-    num1.to_f() / num2.to_f()
-  end
+  result = case op
+            when '1'
+              num1.to_f() + num2.to_f()
+            when '2'
+              num1.to_f() - num2.to_f()
+            when '3'
+              num1.to_f() * num2.to_f()
+            when '4'
+              num1.to_f() / num2.to_f()
+            end
+  puts "=> #{messages("result")} #{result.to_s}"
 end
 
 def another_calc?
@@ -95,17 +110,15 @@ def another_calc?
   answer.downcase().start_with? 'y'
 end
 
-prompt 'welcome'
-name = get_name
-puts "=> #{messages("greeting")} #{name}"
+welcome
 
 loop do
   number1 = get_number('first_number')
   number2 = get_number('second_number')
-  operator = get_operator
-  result = crunch_numbers(number1, number2, operator)
-  puts "=> #{messages("result")} #{result.to_s}"
+  operator = get_operator(number2)
+  crunch_numbers(number1, number2, operator)
   break unless another_calc?
+  clear
 end
 
 prompt 'good_bye'
