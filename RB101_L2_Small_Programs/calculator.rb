@@ -27,7 +27,7 @@ def get_name
     name = Kernel.gets().chomp()
     break if valid_name?(name)
   end
-  puts "=> #{messages("greeting")} #{name}"
+  puts "=> #{messages('greeting')} #{name}"
 end
 
 def valid_name?(name)
@@ -92,16 +92,16 @@ end
 
 def crunch_numbers(num1, num2, op)
   result = case op
-            when '1'
-              num1.to_f() + num2.to_f()
-            when '2'
-              num1.to_f() - num2.to_f()
-            when '3'
-              num1.to_f() * num2.to_f()
-            when '4'
-              num1.to_f() / num2.to_f()
-            end
-  puts "=> #{messages("result")} #{result.to_s}"
+           when '1'
+             num1.to_f() + num2.to_f()
+           when '2'
+             num1.to_f() - num2.to_f()
+           when '3'
+             num1.to_f() * num2.to_f()
+           when '4'
+             num1.to_f() / num2.to_f()
+           end
+  puts "=> #{messages('result')} #{result}"
 end
 
 def another_calc?
