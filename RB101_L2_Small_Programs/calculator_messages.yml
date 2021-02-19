@@ -14,7 +14,8 @@ en:
   divided_by_zero: "Sorry! Cannot divide by 0"
   operation_message: "the two numbers..."
   result: "The result is"
-  another_calc: "Do you want to perform another calculation? (Y to calculate again)"
+  another_calc: "Do you want to perform another calculation? (Y to calculate again, N to exit)"
+  valid_reply: "Invalid input. Please try again."
   good_bye: "Thank you for using the calculator. Good bye!"
 de:
   welcome: "Willkommen bei Calculator! Gib deinen Namen ein:"

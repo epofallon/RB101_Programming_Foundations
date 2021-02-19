@@ -105,9 +105,18 @@ def crunch_numbers(num1, num2, op)
 end
 
 def another_calc?
-  prompt 'another_calc'
-  answer = Kernel.gets().chomp()
-  answer.downcase().start_with? 'y'
+  answer = ''
+  loop do
+    prompt 'another_calc'
+    answer = Kernel.gets().chomp().downcase()
+    break if valid_response?(answer)
+    prompt 'valid_reply'
+  end
+  answer == 'y'
+end
+
+def valid_response?(reply)
+  %w(y n).include? reply
 end
 
 welcome
