@@ -1,0 +1,11 @@
+
+  welcome: "Welcome to Rock, Paper, Scissor, Lizard, Spock!"
+  goal: "First to 5 points wins the game!"
+  choose: "Choose one:"
+  invalid_choice: "That's not a valid choice."
+  you_won_round: "You won this round!"
+  comp_won_round: "Computer won this round!"
+  tie_round: "It's a tie!"
+  you_won_game: "You've won! Congratulations!"
+  comp_won_game: "The computer won. Better luck next time!"
+  good_bye: "Thank you for playing. Good bye!"
