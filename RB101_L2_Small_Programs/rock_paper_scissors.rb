@@ -40,7 +40,7 @@ end
 def display_rules
   answer = ''
   loop do
-    prompt "display_rules?"
+    prompt 'display_rules?'
     answer = Kernel.gets().chomp().downcase
     break if valid_response?(answer)
     prompt 'invalid_choice'
