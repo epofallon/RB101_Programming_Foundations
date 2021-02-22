@@ -81,8 +81,12 @@ def get_comp_choice(choices)
   choices[:computer] = VALID_CHOICES.values.sample
 end
 
-def win?(first, second)
-  WHO_BEATS_WHO[first.to_sym].include?(second)
+def win?(choices)
+  if WHO_BEATS_WHO[choices[:player].to_sym].include?(choices[:computer])
+    :player
+  elsif WHO_BEATS_WHO[choices[:computer].to_sym].include?(choices[:player])
+    :computer
+  end
 end
 
 def display_choices(choices)
@@ -93,23 +97,17 @@ def display_choices(choices)
   sleep(0.75)
 end
 
-def display_result(choices)
-  if win?(choices[:player], choices[:computer])
-    prompt 'you_won_round'
-  elsif win?(choices[:computer], choices[:player])
-    prompt 'comp_won_round'
-  else
-    prompt 'tie_round'
+def display_result(winner)
+  case winner
+  when :player   then prompt 'you_won_round'
+  when :computer then prompt 'comp_won_round'
+  else                prompt 'tie_round'
   end
   prompt 'spacer'
 end
 
-def update_score(choices, scores)
-  if win?(choices[:player], choices[:computer])
-    scores[:player] += 1
-  elsif win?(choices[:computer], choices[:player])
-    scores[:computer] += 1
-  end
+def update_score(winner, scores)
+  scores[winner] += 1 unless scores[winner].nil?
 end
 
 def display_score(scores)
@@ -123,9 +121,13 @@ def goal_reached?(scores)
   scores.value?(GOAL_WINS)
 end
 
-def display_winner(scores)
+def grand_winner(scores)
+  scores[:player] == GOAL_WINS ? :player : :winner
+end
+
+def display_winner(champ)
   prompt 'spacer'
-  prompt scores[:player] == GOAL_WINS ? 'you_won_game' : 'comp_won_game'
+  prompt champ == :player ? 'you_won_game' : 'comp_won_game'
   prompt 'spacer'
   sleep(0.75)
 end
@@ -152,11 +154,13 @@ loop do
   get_choice(choices)
   get_comp_choice(choices)
   display_choices(choices)
-  display_result(choices)
-  update_score(choices, scores)
+  winner = win?(choices)
+  display_result(winner)
+  update_score(winner, scores)
   display_score(scores)
   next unless goal_reached?(scores)
-  display_winner(scores)
+  champ = grand_winner(scores)
+  display_winner(champ)
   break unless play_again?
   reset_scores(scores)
   clear
