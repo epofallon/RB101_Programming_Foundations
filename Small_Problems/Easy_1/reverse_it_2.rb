@@ -1,7 +1,5 @@
 def reverse_words(string)
-  array = string.split
-  array.each{ |word| word.reverse! if word.length >= 5 }
-  array.join(' ')
+  string.split.each{ |word| word.reverse! if word.length >= 5 }.join(' ')
 end
 
 

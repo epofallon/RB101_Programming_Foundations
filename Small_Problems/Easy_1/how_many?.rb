@@ -1,5 +1,5 @@
 def count_occurrences(vehicles, vehicle_hash)
-  index_array = vehicles.union
+  index_array = vehicles.uniq
   index_array.each{ |var| vehicle_hash[var] = vehicles.count(var) }
 end
 
