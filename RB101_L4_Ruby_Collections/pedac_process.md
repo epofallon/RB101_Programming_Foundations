@@ -72,13 +72,13 @@ Statement: Given a string, produce a new string with every other word removed.
 - Create test cases
 - Code with intent
 
-## Sum Even Number Rows
+# Sum Even Number Rows
 Imagine a sequence of consecutive even integers beginning with 2. The integers are grouped in
 rows, with the first row containing one integer, the second row two integers, the third row three
 integers, and so on. Given an integer representing the number of a particular row, return an
 integer representing the sum of all the integers in that row.
 
-**Rules / Requirements**
+## Rules / Requirements
 - Sequence of even integers
 - Sequence begins with two
 - Integers are consecutive
@@ -102,7 +102,7 @@ integer representing the sum of all the integers in that row.
 
 - How do we create the structure?
 
-**Test Case / Examples**
+## Test Case / Examples
 row number: 1 --> sum of integers in row: 2
 row number: 2 --> sum of integers in row: 10
 row number: 4 --> sum of integers in row: 68
@@ -111,7 +111,7 @@ row number: 4 --> sum of integers in row: 68
 4,  6 --> 10
 14, 16, 18, 20 --> 68 Confirms intial structure
 
-**Data Structure**
+## Data Structure
 2
 4,  6
 8,  10, 12
@@ -132,7 +132,7 @@ row number: 4 --> sum of integers in row: 68
   ....
 ]
 
-**Algorithm**
+## Algorithm
 1. Create an empty 'rows' array to contain all of the rows
 2. Create 'row' array and add it to the overall 'rows' array
 3. Repeat step 2 until all the necessary rows have been created
@@ -179,7 +179,7 @@ Algorithm:
   - Increment the start integer by 2
   - Break out of the loop if length of row = row_length
 
-## Final Thoughts
+# Final Thoughts
 - Don't think of PEDAC as a linear process
   - Approach in order, but you will jump back an forth as you progress (refining previous steps)
 - Trying to problem solve and code at the same time is difficult with complex problems
