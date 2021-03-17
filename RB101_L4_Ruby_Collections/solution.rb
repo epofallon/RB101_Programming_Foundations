@@ -1,9 +1,11 @@
 def sum_even_number_row(row_number)
   rows = []
+  start_integer = 2
   (1..row_number).each do |current_row_number|
     rows << create_row(start_integer, current_row_number)
+    start_integer = rows.last.last + 2
   end
-  rows # TODO: sum the final row and return the sum
+  rows.last.sum
 end
 
 def create_row(start_integer, row_length)
@@ -21,9 +23,9 @@ end
 # row number: 2 --> sum of integers in row: 10
 # row number: 4 --> sum of integers in row: 68
 
-p sum_even_number_row(1) #== 2  # true
-p sum_even_number_row(2) #== 10 # true
-p sum_even_number_row(4) #== 68 # true
+p sum_even_number_row(1) == 2  # true
+p sum_even_number_row(2) == 10 # true
+p sum_even_number_row(4) == 68 # true
 
 # start: 2, length: 1 --> [2]
 # start: 4, length: 2 --> [4, 6]

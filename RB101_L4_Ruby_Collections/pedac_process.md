@@ -72,7 +72,6 @@ Statement: Given a string, produce a new string with every other word removed.
 - Create test cases
 - Code with intent
 
-
 ## Sum Even Number Rows
 Imagine a sequence of consecutive even integers beginning with 2. The integers are grouped in
 rows, with the first row containing one integer, the second row two integers, the third row three
@@ -144,9 +143,9 @@ row number: 4 --> sum of integers in row: 68
 - Calculating the start integer:
   - Rule: first integer of the row == last integer of preceding row + 2
   - Algoritm:
-    - Get the preceding row
+    - Get the last row of the rows array
     - Get the last integer of that row
-    - Add 2 to the integer #STOPPED AT 34:42 IN VIDEO
+    - Add 2 to the integer
 *Problem: Create a Row*
 Rules:
 - Row is an array
@@ -179,3 +178,9 @@ Algorithm:
   - Add the start integer to the row
   - Increment the start integer by 2
   - Break out of the loop if length of row = row_length
+
+## Final Thoughts
+- Don't think of PEDAC as a linear process
+  - Approach in order, but you will jump back an forth as you progress (refining previous steps)
+- Trying to problem solve and code at the same time is difficult with complex problems
+  - But switch between implenetation mode to abstract problem solving mode when necessary
