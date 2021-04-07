@@ -14,7 +14,7 @@ end
 # rubocop:disable Metrics/AbcSize
 def display_board(brd)
   system 'clear'
-  prompt "You're a #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
+  prompt "Player: #{PLAYER_MARKER}. Computer: #{COMPUTER_MARKER}."
   puts ""
   puts "     |     |   "
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -41,13 +41,24 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def joinor(arr, delimiter=', ', last_word='or')
+  case arr.length
+  when 0 then ''
+  when 1 then arr.last
+  when 2 then arr.join(" #{last_word} ")
+  else
+    arr[-1] = "#{last_word} #{arr.last}"
+    arr.join(delimiter)
+  end
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
+    prompt "Choose a square (#{joinor(empty_squares(brd))}):"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
-    prompt "Sorry, that's not a valid loop"
+    prompt "Sorry, that's not a valid number"
   end
   brd[square] = PLAYER_MARKER
 end
@@ -76,9 +87,13 @@ def detect_winner(brd)
   nil
 end
 
+def update_score(winner, scores)
+  scores[winner] += 1 #unless scores[winner].nil?
+end
+scores = { 'Player'=>0, 'Computer'=>0 }
 loop do
   board = initialize_board
-
+  
   loop do
     display_board(board)
 
@@ -92,11 +107,13 @@ loop do
   display_board(board)
 
   if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
+    winner = detect_winner(board)
+    prompt "#{winner} won!"
+    update_score(winner,scores)
   else
     prompt "It's a tie!"
   end
-
+  prompt "Player: #{scores['Player']}; Computer: #{scores['Computer']}"
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
