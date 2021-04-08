@@ -14,7 +14,7 @@ wins. If all 9 squares are marked and no player has 3 squares in a row, then the
 4. Display the updated board state
 5. If winner, display winner
 6. If board is full, display tie
-7. If neither winner nor board is full, got to #2
+7. If neither winner nor board is full, go to #2
 8. Play again?
 9. If yes, go to #1
 10. Good bye!

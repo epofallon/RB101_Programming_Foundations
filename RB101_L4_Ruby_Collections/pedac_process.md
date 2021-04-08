@@ -15,7 +15,7 @@
   - Making our understanding of the problem more explicit, which in turn helps when thinking
     about the data structures and algorithms required to solve the problem and the code
     implementation of the solution.
-
+ 
 **General Example**
 Statement: Given a string, produce a new string with every other word removed.
 

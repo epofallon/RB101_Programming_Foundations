@@ -32,8 +32,14 @@ def welcome
   sleep(1)
   prompt 'goal'
   sleep(1)
-  #display_rules
+  prompt "#{who_goes_first} goes first."
+  sleep(1)
+  # display_rules
   clear
+end
+
+def who_goes_first
+  ['Player', 'Computer'].sample
 end
 
 # rubocop:disable Metrics/AbcSize
@@ -89,8 +95,29 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+  marker = offense?(brd) ? COMPUTER_MARKER : PLAYER_MARKER
+
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd, marker)
+    break if square
+  end
+
+  square ||= brd[5] == ' ' ? 5 : empty_squares(brd).sample
+
   brd[square] = COMPUTER_MARKER
+end
+
+def offense?(brd)
+  WINNING_LINES.any? do |line|
+    find_at_risk_square(line, brd, COMPUTER_MARKER)
+  end
+end
+
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
 end
 
 def board_full?(brd)
@@ -113,7 +140,7 @@ def detect_winner(brd)
 end
 
 def update_score(winner, scores)
-  scores[winner] += 1 #unless scores[winner].nil?
+  scores[winner] += 1 # unless scores[winner].nil?
 end
 
 def display_score(scores)
@@ -142,7 +169,7 @@ def play_again?
   answer = ''
   loop do
     prompt 'play_again?'
-    answer = Kernel.gets().chomp().downcase
+    answer = gets.chomp.downcase
     break if valid_response?(answer)
     prompt 'invalid_choice'
   end
@@ -154,10 +181,11 @@ def reset_scores(scores)
 end
 
 welcome
-scores = { 'Player'=>0, 'Computer'=>0 }
+
+scores = { 'Player' => 0, 'Computer' => 0 }
 loop do
   board = initialize_board
-  
+
   loop do
     display_board(board)
 
@@ -173,7 +201,7 @@ loop do
   if someone_won?(board)
     winner = detect_winner(board)
     prompt "#{winner} won!"
-    update_score(winner,scores)
+    update_score(winner, scores)
   else
     prompt 'tie_round'
   end
