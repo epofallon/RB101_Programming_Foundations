@@ -4,6 +4,7 @@
   display_rules?: "Would you like to view the rules? (Press Y to view rules / N to start game)"
   spacer: "--------------------------------"
   any_key: "Hit any key to start the game"
+  go_first: "Please select who goes first (Press P for player, C for computer, or R for random)"
   choose: "Choose one:"
   invalid_choice: "That's not a valid choice."
   you_chose: "You chose:"

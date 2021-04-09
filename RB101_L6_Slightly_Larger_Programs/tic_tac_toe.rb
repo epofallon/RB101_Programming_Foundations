@@ -18,8 +18,8 @@ def prompt(msg)
   puts messages(msg) ? "=> #{messages(msg)}" : "=> #{msg}"
 end
 
-def valid_response?(answer)
-  %w(y n).include? answer
+def valid_response?(answer, check_arr)
+  check_arr.include? answer
 end
 
 def clear
@@ -32,19 +32,41 @@ def welcome
   sleep(1)
   prompt 'goal'
   sleep(1)
-  prompt "#{who_goes_first} goes first."
-  sleep(1)
+
   # display_rules
-  clear
 end
 
 def who_goes_first
-  ['Player', 'Computer'].sample
+  answer = ''
+  loop do
+    prompt 'go_first'
+    answer = gets.chomp.downcase
+    break if valid_response?(answer, %w(p c r))
+    prompt 'invalid_choice'
+  end
+  if answer == 'r'
+    rand_choice = %w(p c).sample
+  end
+  display_choice(answer, rand_choice)
+  sleep(2)
+  answer == 'r' ? rand_choice : answer
+end
+
+def display_choice(answer, rand_choice)
+  case answer
+  when 'p'
+    prompt "You chose 'Player' to go first."
+  when 'c'
+    prompt "You chose 'Computer' to go first."
+  when 'r'
+    goes_first = rand_choice == 'p' ? 'Player' : 'Computer'
+    prompt "The Computer chose '#{goes_first}' to go first."
+  end
 end
 
 # rubocop:disable Metrics/AbcSize
 def display_board(brd)
-  system 'clear'
+  clear
   prompt "Player: '#{PLAYER_MARKER}'. Computer: '#{COMPUTER_MARKER}'."
   puts ""
   puts "     |     |   "
@@ -106,6 +128,27 @@ def computer_places_piece!(brd)
   square ||= brd[5] == ' ' ? 5 : empty_squares(brd).sample
 
   brd[square] = COMPUTER_MARKER
+end
+
+def play_round(brd, goes_first)
+  loop do
+    display_board(brd)
+    case goes_first
+    when 'p'
+      player_places_piece!(brd)
+      break if someone_won?(brd) || board_full?(brd)
+      display_board(brd)
+      sleep(0.5)
+      computer_places_piece!(brd)
+      break if someone_won?(brd) || board_full?(brd)
+    when 'c'
+      computer_places_piece!(brd)
+      break if someone_won?(brd) || board_full?(brd)
+      display_board(brd)
+      player_places_piece!(brd)
+      break if someone_won?(brd) || board_full?(brd)
+    end
+  end
 end
 
 def offense?(brd)
@@ -170,7 +213,7 @@ def play_again?
   loop do
     prompt 'play_again?'
     answer = gets.chomp.downcase
-    break if valid_response?(answer)
+    break if valid_response?(answer, %w(y n))
     prompt 'invalid_choice'
   end
   answer == 'y'
@@ -182,20 +225,12 @@ end
 
 welcome
 
+goes_first = who_goes_first
+
 scores = { 'Player' => 0, 'Computer' => 0 }
 loop do
   board = initialize_board
-
-  loop do
-    display_board(board)
-
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-  end
-
+  play_round(board, goes_first)
   display_board(board)
 
   if someone_won?(board)
