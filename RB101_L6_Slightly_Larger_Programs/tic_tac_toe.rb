@@ -5,6 +5,9 @@ PROMPTS = YAML.load_file('ttt_messages.yml')
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+CENTER_SQR = 5
+COUNT_TO_WIN = 3
+AT_RISK_COUNT = COUNT_TO_WIN - 1
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
@@ -32,8 +35,6 @@ def welcome
   sleep(1)
   prompt 'goal'
   sleep(1)
-
-  # display_rules
 end
 
 def who_goes_first
@@ -44,9 +45,8 @@ def who_goes_first
     break if valid_response?(answer, %w(p c r))
     prompt 'invalid_choice'
   end
-  if answer == 'r'
-    rand_choice = %w(p c).sample
-  end
+  
+  rand_choice = %w(p c).sample if answer == 'r'
   display_choice(answer, rand_choice)
   sleep(2)
   answer == 'r' ? rand_choice : answer
@@ -54,10 +54,8 @@ end
 
 def display_choice(answer, rand_choice)
   case answer
-  when 'p'
-    prompt "You chose 'Player' to go first."
-  when 'c'
-    prompt "You chose 'Computer' to go first."
+  when 'p' then prompt 'you_chose_p'
+  when 'c' then prompt 'you_chose_c'
   when 'r'
     goes_first = rand_choice == 'p' ? 'Player' : 'Computer'
     prompt "The Computer chose '#{goes_first}' to go first."
@@ -67,7 +65,7 @@ end
 # rubocop:disable Metrics/AbcSize
 def display_board(brd)
   clear
-  prompt "Player: '#{PLAYER_MARKER}'. Computer: '#{COMPUTER_MARKER}'."
+  display_game_info
   puts ""
   puts "     |     |   "
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
@@ -84,10 +82,13 @@ def display_board(brd)
 end
 # rubocop:enable Metrics/AbcSize
 
+def display_game_info
+  prompt "Player: '#{PLAYER_MARKER}'"
+  prompt "Computer: '#{COMPUTER_MARKER}'"
+end
+
 def initialize_board
-  new_board = {}
-  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
-  new_board
+  (1..9).each_with_object({}) { |num, brd| brd[num] = INITIAL_MARKER }
 end
 
 def empty_squares(brd)
@@ -125,30 +126,8 @@ def computer_places_piece!(brd)
     break if square
   end
 
-  square ||= brd[5] == ' ' ? 5 : empty_squares(brd).sample
-
+  square ||= brd[CENTER_SQR] == ' ' ? CENTER_SQR : empty_squares(brd).sample
   brd[square] = COMPUTER_MARKER
-end
-
-def play_round(brd, goes_first)
-  loop do
-    display_board(brd)
-    case goes_first
-    when 'p'
-      player_places_piece!(brd)
-      break if someone_won?(brd) || board_full?(brd)
-      display_board(brd)
-      sleep(0.5)
-      computer_places_piece!(brd)
-      break if someone_won?(brd) || board_full?(brd)
-    when 'c'
-      computer_places_piece!(brd)
-      break if someone_won?(brd) || board_full?(brd)
-      display_board(brd)
-      player_places_piece!(brd)
-      break if someone_won?(brd) || board_full?(brd)
-    end
-  end
 end
 
 def offense?(brd)
@@ -158,8 +137,26 @@ def offense?(brd)
 end
 
 def find_at_risk_square(line, board, marker)
-  if board.values_at(*line).count(marker) == 2
+  if board.values_at(*line).count(marker) == AT_RISK_COUNT
     board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
+end
+
+def place_piece!(brd, player)
+  player == 'p' ? player_places_piece!(brd) : computer_places_piece!(brd)
+end
+
+def alternate_player(current_player)
+  current_player == 'p' ? 'c' : 'p'
+end
+
+def play_rounds(brd, goes_first)
+  current_player = goes_first
+  loop do
+    display_board(brd)
+    place_piece!(brd, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(brd) || board_full?(brd)
   end
 end
 
@@ -173,9 +170,9 @@ end
 
 def detect_winner(brd)
   WINNING_LINES.each do |line|
-    if brd.values_at(*line).count(PLAYER_MARKER) == 3
+    if brd.values_at(*line).count(PLAYER_MARKER) == COUNT_TO_WIN
       return 'Player'
-    elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
+    elsif brd.values_at(*line).count(COMPUTER_MARKER) == COUNT_TO_WIN
       return 'Computer'
     end
   end
@@ -183,7 +180,7 @@ def detect_winner(brd)
 end
 
 def update_score(winner, scores)
-  scores[winner] += 1 # unless scores[winner].nil?
+  scores[winner] += 1
 end
 
 def display_score(scores)
@@ -224,13 +221,12 @@ def reset_scores(scores)
 end
 
 welcome
-
 goes_first = who_goes_first
-
 scores = { 'Player' => 0, 'Computer' => 0 }
+
 loop do
   board = initialize_board
-  play_round(board, goes_first)
+  play_rounds(board, goes_first)
   display_board(board)
 
   if someone_won?(board)
@@ -240,11 +236,13 @@ loop do
   else
     prompt 'tie_round'
   end
+  
   display_score(scores)
   next unless goal_reached?(scores)
   champ = grand_winner(scores)
   display_winner(champ)
   break unless play_again?
+  goes_first = who_goes_first
   reset_scores(scores)
 end
 
