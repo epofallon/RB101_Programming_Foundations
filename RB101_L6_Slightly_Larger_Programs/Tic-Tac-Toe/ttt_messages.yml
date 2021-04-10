@@ -1,6 +1,7 @@
 
   welcome: "Welcome to Tic-Tac-Toe!"
   goal: "First to 5 points wins the game!"
+  game_layout: "The board is numbered 1-9:"
   spacer: "--------------------------------"
   go_first: "Please choose who goes first (Press P for player, C for computer, or R for random)"
   invalid_choice: "That's not a valid choice."
