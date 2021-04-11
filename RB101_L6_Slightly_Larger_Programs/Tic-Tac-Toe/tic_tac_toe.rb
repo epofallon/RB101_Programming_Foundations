@@ -248,7 +248,7 @@ def play_again?
   answer = ''
   loop do
     prompt 'play_again?'
-    answer = gets.chomp.downcase
+    answer = gets.chomp.downcase.delete(' ')
     break if valid_response?(answer, %w(y n))
     prompt 'invalid_choice'
   end
