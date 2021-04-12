@@ -25,25 +25,68 @@ def first_deal (deck, hands)
 end
 
 def sum_hand(hands, player, totals)
+  sum = 0
   hands[player].each do |card|
-    totals[player] += card.values[0]
+    sum += card.values[0]
   end
-  
+  totals[player] = sum
 end
+
+def any_aces?(hands, player)
+  hands[player].any? { |card| card.key?('ace') }
+end
+
+def pull_aces(hands, player)
+  player_aces = []
+  hands[player].each do |card|
+    player_aces << card if card.key?('ace')
+  end
+  player_aces
+end
+
+def assign_aces(hands, player, totals)
+  aces = pull_aces(hands, player)
+  count = 0
+  loop do
+    break if (totals[player] <= 21) || (count == aces.length)
+    aces[count]['ace'] = 1
+    sum_hand(hands, player, totals)
+    count += 1
+  end
+end
+
+def busted?(totals, player)
+  totals[player] > 21
+end
+  
 
 hands =  { player: [], dealer: []}
 totals = { player: 0, dealer: 0 }
 deck = initialize_deck
+current_player = :player
 
 first_deal(deck, hands)
 
-p "Player's hand is #{hands[:player]}"
-p "Dealer's hand is #{hands[:dealer]}"
+loop do
+  puts "hit or stay"
+  answer = gets.chomp
+  break if answer == 'stay' || busted?(totals, current_player)
+  deal_card(deck, hands, current_player)
+  sum_hand(hands, current_player, totals)
+  assign_aces(hands, current_player, totals) if any_aces?(hands, current_player)
+end
 
-sum_hand(hands, :player, totals)
-sum_hand(hands, :dealer, totals)
+sum_hand(hands, current_player, totals)
+assign_aces(hands, current_player, totals) if any_aces?(hands, current_player)
 
-p totals
+if busted?(totals, current_player)
+  puts 'You busted!'
+else
+  puts 'You chose to stay!'
+end
+
+
+
 
 
 
