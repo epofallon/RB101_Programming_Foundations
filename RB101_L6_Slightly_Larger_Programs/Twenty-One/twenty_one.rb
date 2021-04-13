@@ -41,24 +41,20 @@ def sum_hand(hands, player, totals)
     sum += card.values[0]
   end
   totals[player] = sum
-end
-
-def any_aces?(hands, player)
-  hands[player].any? { |card| card.key?('ace') }
+  adjust_aces(hands, player, totals) unless pull_aces(hands, player).empty?
 end
 
 def pull_aces(hands, player)
   hands[player].select { |card| card.key?('ace') }
 end
 
-def assign_aces(hands, player, totals)
-  aces = pull_aces(hands, player)
-  count = 0
-  loop do
-    break if (totals[player] <= 21) || (count == aces.length)
-    aces[count]['ace'] = 1
-    sum_hand(hands, player, totals)
-    count += 1
+def adjust_aces(hands, player, totals)
+  pull_aces(hands, player).each do |ace|
+    binding.pry
+    if totals[player] > 21 && ace['ace'] == 11
+      ace['ace'] = 1
+      totals[player] -= 10
+    end
   end
 end
 
@@ -83,7 +79,6 @@ def player_turn(deck, hands, totals, current_player)
       deal_card(deck, hands, current_player)
     end
     sum_hand(hands, current_player, totals)
-    assign_aces(hands, current_player, totals) unless pull_aces(hands, current_player).empty?
     break if answer == 'stay' || busted?(totals, current_player)
   end
   
@@ -99,7 +94,6 @@ def dealer_turn(deck, hands, totals, current_player)
   current_player = :dealer
   loop do
     sum_hand(hands, current_player, totals)
-    assign_aces(hands, current_player, totals) unless pull_aces(hands, current_player).empty?
     break if totals[current_player] >= 17
     deal_card(deck, hands, current_player)
   end
@@ -171,7 +165,6 @@ loop do
       prompt "You chose to hit!"
       prompt "Your cards are now: #{hands[current_player]}"
       sum_hand(hands, current_player, totals)
-      assign_aces(hands, current_player, totals) unless pull_aces(hands, current_player).empty?
       prompt "Your total is now: #{totals[current_player]}"
     end
     
@@ -180,7 +173,7 @@ loop do
   
   if busted?(totals, current_player)
     display_winner(totals)
-    play_again? ? 'next' : 'break'
+    play_again? ? next : break
   else
     prompt "you stayed at #{totals[current_player]}"
   end
