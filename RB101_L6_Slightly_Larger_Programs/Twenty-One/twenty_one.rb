@@ -6,6 +6,9 @@ SUIT_ARR = [{ '2' => 2 }, { '3' => 3 }, { '4' => 4 }, { '5' => 5 },
             { '6' => 6 }, { '7' => 7 }, { '8' => 8 }, { '9' => 9 },
             { '10' => 10 }, { 'jack' => 10 }, { 'queen' => 10 },
             { 'king' => 10 }, { 'ace' => 11 }]
+DEALER_MIN = 17
+GOAL_TOTAL = 21
+GOAL_WINS = 5
 
 def messages(string)
   PROMPTS[string]
@@ -17,6 +20,32 @@ end
 
 def valid_response?(answer, check_arr)
   check_arr.include? answer
+end
+
+def welcome
+  prompt 'welcome'
+  prompt "Get your card total as close to #{GOAL_TOTAL} without going over."
+  prompt "First to #{GOAL_WINS} points wins the game!"
+end
+
+def play_round(scores)
+  loop do # rounds loop
+    hands, totals = initialize_players
+    deck = initialize_deck
+    current_player = :player
+    first_deal(deck, hands)
+    sum_both_hands(hands, totals)
+    display_hands(hands, totals, current_player)
+    player_turn(deck, hands, totals, current_player)
+
+    unless busted?(totals, current_player)
+      current_player = :dealer
+      dealer_turn(deck, hands, totals, current_player)
+    end
+
+    round_result(hands, totals, scores)
+    break if goal_reached?(scores)
+  end
 end
 
 def initialize_deck
@@ -62,11 +91,16 @@ end
 
 def adjust_aces(hands, player, totals)
   pull_aces(hands, player).each do |ace|
-    if totals[player] > 21 && ace['ace'] == 11
+    if totals[player] > GOAL_TOTAL && ace['ace'] == 11
       ace['ace'] = 1
       totals[player] -= 10
     end
   end
+end
+
+def display_hands(hands, totals, current_player)
+  prompt "the dealer has #{hands[:dealer][0]} and ???"
+  prompt "Your cards: #{hands[current_player]} with total: #{totals[:player]}"
 end
 
 def hit_or_stay
@@ -90,23 +124,29 @@ def player_turn(deck, hands, totals, current_player)
       prompt "Your cards are now: #{hands[current_player]}"
       prompt "Your total is now: #{totals[current_player]}"
     end
+    prompt "you stayed at #{totals[current_player]}" if player_choice == 's'
     break if player_choice == 's' || busted?(totals, current_player)
   end
 end
 
 def dealer_turn(deck, hands, totals, current_player)
+  prompt 'dealer_turn'
   loop do
-    break if totals[current_player] >= 17
+    break if totals[current_player] >= DEALER_MIN
     prompt 'dealer_hit'
     sleep(1)
     deal_card(deck, hands, current_player)
     sum_hand(hands, current_player, totals)
     prompt "Dealer's cards are now: #{hands[current_player]}"
   end
+
+  unless busted?(totals, current_player)
+    prompt "Dealer stayed at #{totals[current_player]}"
+  end
 end
 
 def busted?(totals, player)
-  totals[player] > 21
+  totals[player] > GOAL_TOTAL
 end
 
 def winner(totals)
@@ -160,6 +200,10 @@ def round_result(hands, totals, scores)
   display_score(scores)
 end
 
+def goal_reached?(scores)
+  scores.value?(GOAL_WINS)
+end
+
 def play_again?
   answer = ''
   loop do
@@ -171,42 +215,15 @@ def play_again?
   answer == 'y'
 end
 
-prompt 'welcome'
-scores = { player: 0, dealer: 0 }
-
-loop do
-  hands, totals = initialize_players
-  deck = initialize_deck
-  current_player = :player
-
-  first_deal(deck, hands)
-  sum_both_hands(hands, totals)
-
-  prompt "the dealer has #{hands[:dealer][0]} and ???"
-  prompt "your cards are #{hands[current_player]} with total: #{totals[:player]}"
-  player_turn(deck, hands, totals, current_player)
-
-  if busted?(totals, current_player)
-    round_result(hands, totals, scores)
-    play_again? ? next : break
-  else
-    prompt "you stayed at #{totals[current_player]}"
-  end
-
-  prompt 'dealer_turn'
-  current_player = :dealer
-
-  dealer_turn(deck, hands, totals, current_player)
-
-  if busted?(totals, current_player)
-    round_result(hands, totals, scores)
-    play_again? ? next : break
-  else
-    prompt "Dealer stayed at #{totals[current_player]}"
-  end
-
-  round_result(hands, totals, scores)
-  break unless play_again?
+def reset_scores(scores)
+  scores.transform_values! { 0 }
 end
 
+welcome
+scores = { player: 0, dealer: 0 }
+loop do # match loop
+  play_round(scores)
+  break unless play_again?
+  reset_scores(scores)
+end
 prompt 'good_bye'
