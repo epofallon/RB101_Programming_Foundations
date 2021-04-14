@@ -34,3 +34,8 @@
   - repeat until total >= 17
 6. If dealer bust, player wins
 7. Compare cards and declare winner.
+8. 
+
+if player busts - dealer wins
+if dealer busts - player wins
+if both stay - compare scores
