@@ -6,6 +6,8 @@ SUIT_ARR = [{ '2' => 2 }, { '3' => 3 }, { '4' => 4 }, { '5' => 5 },
             { '6' => 6 }, { '7' => 7 }, { '8' => 8 }, { '9' => 9 },
             { '10' => 10 }, { 'Jack' => 10 }, { 'Queen' => 10 },
             { 'King' => 10 }, { 'Ace' => 11 }]
+SUITS = ['C', 'S', 'H', 'D']
+VALUES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
 DEALER_MIN = 17
 GOAL_TOTAL = 21
 GOAL_WINS = 5
@@ -49,7 +51,7 @@ end
 
 def inititalize_first_hands(deck, hands, totals)
   first_deal(deck, hands)
-  sum_both_hands(hands, totals)
+  total_both_hands(hands, totals)
   display_first_hands(hands, totals)
 end
 
@@ -57,15 +59,9 @@ def play_rounds(scores)
   loop do
     hands, totals = initialize_players
     deck = initialize_deck
-    current_player = :player
     inititalize_first_hands(deck, hands, totals)
-    player_turn(deck, hands, totals, current_player)
-
-    unless busted?(totals, current_player)
-      current_player = :dealer
-      dealer_turn(deck, hands, totals, current_player)
-    end
-
+    player_turn(deck, hands, totals, :player)
+    dealer_turn(deck, hands, totals, :dealer) unless busted?(totals, :player)
     round_result(hands, totals, scores)
     break if goal_reached?(scores)
     press_to_continue
@@ -84,25 +80,26 @@ def initialize_players
   return { player: [], dealer: [] }, { player: 0, dealer: 0 }
 end
 
-def deal_card(deck, hands, player)
+def deal_card!(deck, hands, player)
   card = deck.shift
   hands[player] << { card.keys[0] => card.values[0] }
 end
 
 def first_deal(deck, hands)
   2.times do
-    deal_card(deck, hands, :player)
-    deal_card(deck, hands, :dealer)
+    deal_card!(deck, hands, :player)
+    deal_card!(deck, hands, :dealer)
   end
 end
 
-def sum_both_hands(hands, totals)
-  [:player, :dealer].each { |player| sum_hand(hands, player, totals) }
+def total_both_hands(hands, totals)
+  [:player, :dealer].each { |player| total_hand!(hands, player, totals) }
 end
 
-def sum_hand(hands, player, totals)
+def total_hand!(hands, player, totals)
   sum = 0
   hands[player].each do |card|
+    binding.pry
     sum += card.values[0]
   end
   totals[player] = sum
@@ -161,32 +158,31 @@ def player_turn(deck, hands, totals, current_player)
 end
 
 def player_hit(deck, hands, totals, current_player)
-  deal_card(deck, hands, current_player)
+  deal_card!(deck, hands, current_player)
   prompt 'player_hit'
   sleep(1)
-  sum_hand(hands, current_player, totals)
+  total_hand!(hands, current_player, totals)
   prompt "Your cards are now: #{show_cards(hands, current_player)}"
   prompt "Your total is now: #{totals[current_player]}"
   sleep(1.5)
 end
 
-def dealer_turn(deck, hands, totals, current_player)
+def dealer_turn(deck, hands, totals, player)
   empty_line
   prompt 'dealer_turn'
   sleep(1)
   loop do
-    break if totals[current_player] >= DEALER_MIN
+    break if totals[player] >= DEALER_MIN
     prompt 'dealer_hit'
     sleep(1)
-    deal_card(deck, hands, current_player)
-    sum_hand(hands, current_player, totals)
-    prompt "Dealer's cards are now: #{show_cards(hands, current_player)}"
+    deal_card!(deck, hands, player)
+    total_hand!(hands, player, totals)
+    prompt "Dealer's cards are now: #{show_cards(hands, player)}"
     sleep(2)
   end
 
-  unless busted?(totals, current_player)
-    prompt "Dealer stayed at #{totals[current_player]}"
-    sleep(2)
+  unless busted?(totals, player)
+    prompt "Dealer stayed at #{totals[player]}"
   end
 end
 
@@ -235,6 +231,7 @@ def display_score(scores)
 end
 
 def display_final_hands(hands, totals)
+  sleep(1)
   empty_line
   puts "==================="
   prompt "Dealer has #{show_cards(hands, :dealer)} totaling: #{totals[:dealer]}"
