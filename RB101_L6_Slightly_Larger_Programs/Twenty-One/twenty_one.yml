@@ -1,5 +1,6 @@
 
-  welcome: "Welcome to Twenty-One!"
+  welcome: "==== WELCOME TO TWENTY-ONE! ===="
+  press_to_continue: "Press ENTER to continue."
   player_busted: "You busted! Dealer wins!"
   dealer_busted: "Dealer busted! You win!"
   player_win: "You win!"
@@ -10,5 +11,7 @@
   player_hit: "You chose to hit!"
   dealer_turn: "Dealer turn..."
   dealer_hit: "Dealer hits!"
+  you_won_game: "You've won! Congratulations!"
+  deal_won_game: "The Dealer won. Better luck next time!"
   play_again: "Do you want to play again? (y or n)"
-  good_bye: "Thank you for playing Twenty-One! Good bye!"
+  good_bye: "ThankS for playing Twenty-One! Good bye!"
