@@ -2,12 +2,8 @@ require 'yaml'
 require 'pry'
 
 PROMPTS = YAML.load_file('twenty_one.yml')
-SUIT_ARR = [{ '2' => 2 }, { '3' => 3 }, { '4' => 4 }, { '5' => 5 },
-            { '6' => 6 }, { '7' => 7 }, { '8' => 8 }, { '9' => 9 },
-            { '10' => 10 }, { 'Jack' => 10 }, { 'Queen' => 10 },
-            { 'King' => 10 }, { 'Ace' => 11 }]
-SUITS = ['C', 'S', 'H', 'D']
-VALUES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
+SUITS = ["\u2663", "\u2660", "\u2665", "\u2666"]
+VALUES = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 DEALER_MIN = 17
 GOAL_TOTAL = 21
 GOAL_WINS = 5
@@ -69,11 +65,13 @@ def play_rounds(scores)
 end
 
 def initialize_deck
-  deck_arr = []
-  4.times do
-    deck_arr << SUIT_ARR
+  deck = []
+  SUITS.each do |suit|
+    VALUES.each do |value|
+      deck << { suit: suit, value: value }
+    end
   end
-  deck_arr.flatten.shuffle
+  deck.shuffle
 end
 
 def initialize_players
@@ -82,7 +80,7 @@ end
 
 def deal_card!(deck, hands, player)
   card = deck.shift
-  hands[player] << { card.keys[0] => card.values[0] }
+  hands[player] << card
 end
 
 def first_deal(deck, hands)
@@ -98,39 +96,57 @@ end
 
 def total_hand!(hands, player, totals)
   sum = 0
-  hands[player].each do |card|
-    binding.pry
-    sum += card.values[0]
-  end
+  hands[player].each { |card| sum += value_card(card) }
   totals[player] = sum
-  adjust_aces(hands, player, totals) unless pull_aces(hands, player).empty?
+  adjust_for_aces(hands, player, totals) unless count_aces(hands, player) == 0
 end
 
-def pull_aces(hands, player)
-  hands[player].select { |card| card.key?('Ace') }
-end
-
-def adjust_aces(hands, player, totals)
-  pull_aces(hands, player).each do |ace|
-    if (totals[player] > GOAL_TOTAL) && (ace['Ace'] == 11)
-      ace['Ace'] = 1
-      totals[player] -= 10
-    end
+def value_card(card)
+  if ('1'..'10').include?(card[:value])
+    card[:value].to_i
+  elsif %w(J K Q).include?(card[:value])
+    10
+  elsif card[:value] == 'A'
+    11
   end
 end
 
-def show_cards(hands, current_player)
+def count_aces(hands, player)
+  hands[player].count { |card| card[:value] == 'A' }
+end
+
+def adjust_for_aces(hands, player, totals)
+  count_aces(hands, player).times do
+    totals[player] -= 10 if totals[player] > GOAL_TOTAL
+  end
+end
+
+def show_cards(hands, player)
   cards = []
-  hands[current_player].each do |card|
-    cards << card.keys[0]
+  hands[player].each do |card|
+    cards << "[#{card[:value]} #{card[:suit]}]"
   end
   cards
 end
 
+def joinand(arr, delimiter=', ', last_word='and')
+  case arr.length
+  when 0 then ''
+  when 1 then arr.last
+  when 2 then arr.join(" #{last_word} ")
+  else
+    arr[-1] = "#{last_word} #{arr.last}"
+    arr.join(delimiter)
+  end
+end
+
 def display_first_hands(hands, totals)
+  dealer_card = show_cards(hands, :dealer)[0]
+  player_cards = joinand(show_cards(hands, :player))
+
   clear
-  prompt "Dealer has [\"#{show_cards(hands, :dealer)[0]}\", \"??\"]"
-  prompt "You have #{show_cards(hands, :player)} totaling: #{totals[:player]}"
+  prompt "Dealer has #{dealer_card} and [???]"
+  prompt "You have #{player_cards} totaling: #{totals[:player]}"
 end
 
 def hit_or_stay
@@ -277,18 +293,18 @@ def play_again?
   answer == 'y'
 end
 
-def reset_scores(scores)
+def reset_scores!(scores)
   scores.transform_values! { 0 }
 end
 
 welcome
 scores = { player: 0, dealer: 0 }
-loop do # match loop
+loop do
   play_rounds(scores)
   sleep(2)
   champ = grand_winner(scores)
   display_champ(champ)
   break unless play_again?
-  reset_scores(scores)
+  reset_scores!(scores)
 end
 prompt 'good_bye'
