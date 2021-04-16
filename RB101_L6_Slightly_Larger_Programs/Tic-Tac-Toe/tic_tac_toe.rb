@@ -110,7 +110,7 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def joinor(arr, delimiter=', ', last_word='or')
+def joinor(arr, delimiter=', ', last_word='and')
   case arr.length
   when 0 then ''
   when 1 then arr.last
