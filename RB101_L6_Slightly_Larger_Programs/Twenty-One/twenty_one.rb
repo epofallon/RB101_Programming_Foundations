@@ -3,7 +3,7 @@ require 'pry'
 
 PROMPTS = YAML.load_file('twenty_one.yml')
 SUITS = ["\u2663", "\u2660", "\u2665", "\u2666"]
-VALUES = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 DEALER_MIN = 17
 GOAL_TOTAL = 21
 GOAL_WINS = 5
@@ -45,10 +45,33 @@ def welcome
   press_to_continue
 end
 
+def initialize_deck
+  deck = []
+  SUITS.each do |suit|
+    VALUES.each do |value|
+      deck << { suit: suit, value: value }
+    end
+  end
+  deck.shuffle
+end
+
+def initialize_players
+  return { player: [], dealer: [] }, { player: 0, dealer: 0 }
+end
+
 def inititalize_first_hands(deck, hands, totals)
   first_deal(deck, hands)
   total_both_hands(hands, totals)
   display_first_hands(hands, totals)
+end
+
+def display_first_hands(hands, totals)
+  dealer_card = show_cards(hands, :dealer)[0]
+  player_cards = joinand(show_cards(hands, :player))
+
+  clear
+  prompt "Dealer has #{dealer_card} and [???]"
+  prompt "You have #{player_cards} totaling: #{totals[:player]}"
 end
 
 def play_rounds(scores)
@@ -64,30 +87,16 @@ def play_rounds(scores)
   end
 end
 
-def initialize_deck
-  deck = []
-  SUITS.each do |suit|
-    VALUES.each do |value|
-      deck << { suit: suit, value: value }
-    end
-  end
-  deck.shuffle
-end
-
-def initialize_players
-  return { player: [], dealer: [] }, { player: 0, dealer: 0 }
-end
-
-def deal_card!(deck, hands, player)
-  card = deck.shift
-  hands[player] << card
-end
-
 def first_deal(deck, hands)
   2.times do
     deal_card!(deck, hands, :player)
     deal_card!(deck, hands, :dealer)
   end
+end
+
+def deal_card!(deck, hands, player)
+  card = deck.shift
+  hands[player] << card
 end
 
 def total_both_hands(hands, totals)
@@ -140,13 +149,16 @@ def joinand(arr, delimiter=', ', last_word='and')
   end
 end
 
-def display_first_hands(hands, totals)
-  dealer_card = show_cards(hands, :dealer)[0]
-  player_cards = joinand(show_cards(hands, :player))
-
-  clear
-  prompt "Dealer has #{dealer_card} and [???]"
-  prompt "You have #{player_cards} totaling: #{totals[:player]}"
+def player_turn(deck, hands, totals, current_player)
+  loop do
+    player_choice = hit_or_stay
+    player_hit(deck, hands, totals, current_player) if player_choice == 'h'
+    if player_choice == 's'
+      prompt "You stayed at #{totals[current_player]}"
+      sleep(1.5)
+    end
+    break if player_choice == 's' || busted?(totals, current_player)
+  end
 end
 
 def hit_or_stay
@@ -161,25 +173,18 @@ def hit_or_stay
   answer
 end
 
-def player_turn(deck, hands, totals, current_player)
-  loop do
-    player_choice = hit_or_stay
-    player_hit(deck, hands, totals, current_player) if player_choice == 'h'
-    if player_choice == 's'
-      prompt "You stayed at #{totals[current_player]}"
-      sleep(2)
-    end
-    break if player_choice == 's' || busted?(totals, current_player)
-  end
-end
-
-def player_hit(deck, hands, totals, current_player)
-  deal_card!(deck, hands, current_player)
+def player_hit(deck, hands, totals, player)
+  deal_card!(deck, hands, player)
   prompt 'player_hit'
   sleep(1)
-  total_hand!(hands, current_player, totals)
-  prompt "Your cards are now: #{show_cards(hands, current_player)}"
-  prompt "Your total is now: #{totals[current_player]}"
+  total_hand!(hands, player, totals)
+  display_player_update(hands, totals, player)
+end
+
+def display_player_update(hands, totals, player)
+  player_cards = joinand(show_cards(hands, player))
+  prompt "Your cards are now: #{player_cards}"
+  prompt "Your total is now: #{totals[player]}"
   sleep(1.5)
 end
 
@@ -193,13 +198,16 @@ def dealer_turn(deck, hands, totals, player)
     sleep(1)
     deal_card!(deck, hands, player)
     total_hand!(hands, player, totals)
-    prompt "Dealer's cards are now: #{show_cards(hands, player)}"
+    display_dealer_update(hands, player)
     sleep(2)
   end
 
-  unless busted?(totals, player)
-    prompt "Dealer stayed at #{totals[player]}"
-  end
+  prompt "Dealer stayed at #{totals[player]}" unless busted?(totals, player)
+end
+
+def display_dealer_update(hands, player)
+  dealer_cards = joinand(show_cards(hands, player))
+  prompt "Dealer's cards are now: #{dealer_cards}"
 end
 
 def busted?(totals, player)
@@ -247,11 +255,13 @@ def display_score(scores)
 end
 
 def display_final_hands(hands, totals)
+  dealer_cards = joinand(show_cards(hands, :dealer))
+  player_cards = joinand(show_cards(hands, :player))
   sleep(1)
   empty_line
   puts "==================="
-  prompt "Dealer has #{show_cards(hands, :dealer)} totaling: #{totals[:dealer]}"
-  prompt "You have #{show_cards(hands, :player)} totaling: #{totals[:player]}"
+  prompt "Dealer has #{dealer_cards} totaling: #{totals[:dealer]}"
+  prompt "You have #{player_cards} totaling: #{totals[:player]}"
   puts "==================="
   sleep(1)
   empty_line
