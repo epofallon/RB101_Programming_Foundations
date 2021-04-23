@@ -21,3 +21,35 @@
   balanced?('What ((is))) up(') == false
 =end
 
+# Data Structure
+  # String to an array of characters
+
+# Algorithm
+=begin
+  - remove characters that aren't ( or )
+  - loop to remove all instances of "()"
+    - break when nil is returned
+  - string length == 0 ?
+=end
+
+def balanced?(string, chars)
+  parentheses_only = string.delete("^#{chars}")
+  loop do
+    break if parentheses_only.gsub!("#{chars}", '') == nil
+  end
+  parentheses_only.size.zero?
+end
+
+def totally_balanced?(string)
+  %w(() '' "" [] {}).all?{ |chars| balanced?(string, chars) }
+end
+  
+
+p totally_balanced?('{What}{} [](is) this?') == true
+p totally_balanced?('What ""is this?') == true
+p totally_balanced?('What (is this?') == false
+p totally_balanced?('((What) (is this))?') == true
+p totally_balanced?('((What)) (is this))?') == false
+p totally_balanced?('Hey!') == true
+p totally_balanced?(')Hey!(') == false
+p totally_balanced?('What ((is))) up(') == false
