@@ -51,4 +51,36 @@
       - :isosceles
   - else scalene
     - :scalene
+    
+  - length_sum?(sides)
+    - sum the 2 smaller sides and compare against the largest side
+    - return true if sum is greater than largest side
 =end
+require 'pry'
+def length_sum?(sides)
+  sides.min(2).sum < sides.max
+end
+
+def all_equal?(sides)
+  sides[0] == sides[1] && sides[1] == sides[2]
+end
+
+def two_equal?(sides)
+  sides[0] == sides[1] || sides[1] == sides[2] || sides[0] == sides[2]
+end
+
+def triangle(side1, side2, side3)
+  sides = [side1, side2, side3]
+  case
+  when sides.include?(0), length_sum?(sides) then :invalid
+  when all_equal?(sides) then :equilateral
+  when two_equal?(sides) then :isosceles
+  else :scalene
+  end
+end
+
+p triangle(3, 3, 3) == :equilateral
+p triangle(3, 3, 1.5) == :isosceles
+p triangle(3, 4, 5) == :scalene
+p triangle(0, 3, 3) == :invalid
+p triangle(3, 1, 1) == :invalid
