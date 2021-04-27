@@ -98,17 +98,19 @@
           - no_swap = false
     - break if no_swap == true
 =end
-
+require 'pry'
 def bubble_sort!(arr)
   pass_its = arr.length - 1
   loop do
-    no_swap = true
+    new_end = 0
     1.upto(pass_its) do |num|
+      #binding.pry
       if arr[num - 1] > arr[num]
         arr[num], arr[num - 1] = arr[num - 1], arr[num]
-        pass_its = num
+        new_end = num
       end
     end
+    pass_its = new_end
     break if pass_its <= 1
   end
 end
