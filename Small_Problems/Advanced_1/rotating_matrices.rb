@@ -64,12 +64,9 @@ def rotate90(matrix)
 end
 
 def rotate_by_angle(matrix, angle)
-  case angle
-  when 90 then rotate90(matrix)
-  when 180 then matrix.map{ |line| line.reverse}.reverse
-  when 270 then rotate90(matrix).map{ |line| line.reverse}.reverse
-  when 360 then matrix
-  end
+  new_mat = matrix
+  (angle / 90).times{ new_mat = rotate90(new_mat) }
+  new_mat
 end
 
   matrix1 = [
