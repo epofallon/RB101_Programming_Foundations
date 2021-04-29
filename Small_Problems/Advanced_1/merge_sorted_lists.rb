@@ -48,25 +48,45 @@
       - increase i_2 by 1
   - return result
 =end
+
+=begin
+ i_1, i_2 = 0, 0
+  (arr_1.size + arr_2.size).times do
+    binding.pry
+    case 
+    when arr_1.empty? then result = arr_2
+    when arr_2.empty? then result = arr_1
+    when arr_2[i_2] == nil, (arr_1[i_1] < arr_2[i_2])
+      result << arr_1[i_1]
+      i_1 += 1
+    when arr_1[i_1] == nil, (arr_2[i_2] < arr_1[i_1])
+      result << arr_2[i_2]
+      i_2 += 1
+    when arr_1[i_1] == arr_2[i_2]
+      result << arr_1[i_1] << arr_2[i_2]
+      i_1 += 1
+      i_2 += 1
+    end
+  end
+=end
 require 'pry'
 def merge(arr_1, arr_2)
   result = []
-  i_1, i_2 = 0, 0
-  (arr_1.size + arr_2.size).times do
-    #sbinding.pry
-    case arr_1[i_1] <=> arr_2[i_2]
-    when -1, 0
-      result << arr_1[i_1]
-      i_1 += 1 if i_1 < arr_1.size
-    when 1
-      result << arr_2[i_2]
-      i_2 += 1 if i_2 < arr_2.size
+  i2 = 0
+  
+  arr_1.each do |value|
+    while i2 < arr_2.size && arr_2[i2] <= value
+      result << arr_2[i2]
+      i2 += 1
     end
+    
+    result << value
   end
-  result
+  
+  result.concat(arr_2[i2..-1]) 
 end
 
-p merge([1, 5, 9], [2, 6, 8]) #== [1, 2, 5, 6, 8, 9]
-p merge([1, 1, 3], [2, 2]) #== [1, 1, 2, 2, 3]
-p merge([], [1, 4, 5]) #== [1, 4, 5]
-p merge([1, 4, 5], []) #== [1, 4, 5]
+p merge([1, 5, 9], [2, 3, 5, 6, 8]) #== [1, 2, 5, 6, 8, 9]
+p merge([1, 1, 3], [2, 2]) == [1, 1, 2, 2, 3]
+p merge([], [1, 4, 5]) == [1, 4, 5]
+p merge([1, 4, 5], []) == [1, 4, 5]
