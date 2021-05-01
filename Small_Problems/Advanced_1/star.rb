@@ -82,7 +82,6 @@ def star(num)
       puts spaces
     end
   end
-  
 end
 
 
