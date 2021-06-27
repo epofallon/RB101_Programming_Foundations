@@ -32,7 +32,7 @@ short_long_short('', 'xyz') == "xyz"
 
 def short_long_short(str1, str2)
   if str1.size > str2.size
-    str2.concat(str1, str2)
+    str2 + (str1, str2)
   elsif str1.size < str2.size
     str1.concat(str2, str1)
   else
