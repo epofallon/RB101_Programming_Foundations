@@ -24,20 +24,23 @@
     # check if that substring multiplication is equal to the string
     
 =end
-
-def repeated_substring_pattern(string)
+def get_substrings(string)
   substrings = []
   1.upto(string.size / 2) do |num|
     if (string.size % num == 0)
       substrings << string[0, num]
     end
   end
-  
+  substring
+end
+
+def repeated_substring_pattern(string)
+  substrings = get_substrings(string)
+
   substrings.each do |substring|
     multiplier = string.size / substring.size
     return true if substring * multiplier == string
   end
-  
   false
 end
 start = Time.now
