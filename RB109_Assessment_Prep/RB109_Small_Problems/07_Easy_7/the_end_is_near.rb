@@ -31,7 +31,7 @@ def penultimate(str)
   
   case 
   when words.size == 0 then ''
-  when words.size.odd? then words[(words.size / 2) ]
+  when words.size.odd? then words[(words.size / 2)]
   else [words[(words.size / 2) -1 ], words[(words.size / 2)]].join(' ')
   end
 end
