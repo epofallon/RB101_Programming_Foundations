@@ -35,14 +35,8 @@
 def fibonacci(n)
   first = 1
   second = 1
-  n_0 = nil
   
-  3.upto(n) do 
-    second, first = [first, first + second]
-    # n_0 = first + second
-    # second = first
-    # first = n_0
-  end
+  3.upto(n) { second, first = [first, first + second] }
   
   first
 end
