@@ -53,22 +53,27 @@ p scramble('scriptingjava', 'javascript') == true
 =end
 
 def scramble(str1, str2)
-  str1_chars = str1.chars
-  str2_chars = str2.chars
-  str1_chars_size = str1_chars.size
+  # str1_chars = str1.chars
+  # str2_chars = str2.chars
+  # str1_chars_size = str1_chars.size
   
-  str2_chars.each do |char2|
-    str1_chars.each_with_index do |char1, idx1|
-      if char1 == char2
-        str1_chars.delete_at(idx1)
-        break
-      end
-    end
-    if str1_chars.size != str1_chars_size
-      str1_chars_size = str1_chars.size
-    else
-      return false
-    end
+  # str2_chars.each do |char2|
+  #   str1_chars.each_with_index do |char1, idx1|
+  #     if char1 == char2
+  #       str1_chars.delete_at(idx1)
+  #       break
+  #     end
+  #   end
+  #   if str1_chars.size != str1_chars_size
+  #     str1_chars_size = str1_chars.size
+  #   else
+  #     return false
+  #   end
+  # end
+  # true
+  
+  str2.chars.each do |char|
+    return false if str1.count(char) < str2.count(char)
   end
   true
 end

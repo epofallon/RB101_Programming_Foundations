@@ -39,13 +39,11 @@ p common_prefix(["throne", "throne"]) == "throne"
 
 def common_prefix(arr)
   prefix = ''
-
   str = arr.shift
-  
+
   (1..str.size).each do |str_size|
     break unless arr.all? { |string| string[0, str_size] == str[0, str_size] }
     prefix = str[0, str_size]
-    prefix
     str_size += 1
   end
   

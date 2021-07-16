@@ -36,11 +36,19 @@
 =end
 
 def max_sequence(array)
+  return 0 if array.all? {|num| num < 0}
   result = []
   
-  (0..array.size).each do |index1|
-    (index1..array.size).each do |index2|
+  (0...array.size).each do |index1|
+    (index1...array.size).each do |index2|
       p result << array[index1..index2]
     end
   end
+  result.max_by { |sub_array| sub_array.sum }
 end
+
+p max_sequence([]) == 0
+p max_sequence([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 6
+p max_sequence([11]) == 11
+p max_sequence([-32]) == 0
+p max_sequence([-2, 1, -7, 4, -10, 2, 1, 5, 4]) == 12 
